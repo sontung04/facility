@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: V11-fix-advanced-skill-level
+      author: admin
+      comment: >
+        Correct seed data: 'ADVANCED' is not a valid TechnicianSkill.skillLevel value.
+        Valid values are BEGINNER, INTERMEDIATE, EXPERT.
+        jane_tech's "Network & IT" skill was seeded as 'ADVANCED'; fix to 'EXPERT'.
+      changes:
+        - sql:
+            sql: |
+              UPDATE technician_skills
+              SET skill_level = 'EXPERT'
+              WHERE skill_level = 'ADVANCED';

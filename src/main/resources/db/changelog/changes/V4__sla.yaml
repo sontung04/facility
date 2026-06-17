@@ -1,0 +1,134 @@
+databaseChangeLog:
+
+  # ── sla_policies ──────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V4-create-sla-policies
+      author: admin
+      changes:
+        - createTable:
+            tableName: sla_policies
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: category_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_sla_policy_category
+                    references: categories(id)
+              - column:
+                  name: acknowledgment_time_minutes
+                  type: INT
+                  constraints:
+                    nullable: false
+                  defaultValue: 30
+              - column:
+                  name: resolution_time_minutes
+                  type: INT
+                  constraints:
+                    nullable: false
+                  defaultValue: 240
+              - column:
+                  name: closure_time_minutes
+                  type: INT
+                  constraints:
+                    nullable: false
+                  defaultValue: 1440
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+                  defaultValue: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - createIndex:
+            indexName: idx_sla_policy_category_id
+            tableName: sla_policies
+            columns:
+              - column:
+                  name: category_id
+        - addUniqueConstraint:
+            tableName: sla_policies
+            columnNames: category_id
+            constraintName: uk_sla_policy_category
+
+  # ── sla_breaches ──────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V4-create-sla-breaches
+      author: admin
+      changes:
+        - createTable:
+            tableName: sla_breaches
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ticket_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_sla_breach_ticket
+                    references: tickets(id)
+              - column:
+                  name: breach_type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expected_by
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: actual_breach_at
+                  type: TIMESTAMP
+              - column:
+                  name: is_breached
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+                  defaultValue: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - createIndex:
+            indexName: idx_sla_breach_ticket_id
+            tableName: sla_breaches
+            columns:
+              - column:
+                  name: ticket_id
+        - createIndex:
+            indexName: idx_sla_breach_is_breached
+            tableName: sla_breaches
+            columns:
+              - column:
+                  name: is_breached
+        - createIndex:
+            indexName: idx_sla_breach_expected_by
+            tableName: sla_breaches
+            columns:
+              - column:
+                  name: expected_by

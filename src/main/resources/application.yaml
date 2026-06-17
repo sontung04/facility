@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: facility
+  docker:
+    compose:
+      enabled: true
+  task:
+    scheduling:
+      enabled: true
+      pool:
+        size: 2
+      thread-name-prefix: facility-scheduler-
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/facility_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate.format_sql: true
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
+    drop-first: false
+
+  # Redis Configuration for token blacklisting
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+
+# JWT Configuration for Basic Auth
+jwt:
+  secret: ${JWT_SECRET:your-secret-key-for-jwt-token-generation-at-least-256-bit-long-for-security}
+  expiration: ${JWT_EXPIRATION:86400000} # 24 hours in milliseconds
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7 days in milliseconds
+
+# Keycloak Configuration for OAuth2
+keycloak:
+  realm: ${KEYCLOAK_REALM:facility}
+  auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080}
+  ssl-required: external
+  resource: ${KEYCLOAK_CLIENT_ID:facility-client}
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET:your-keycloak-client-secret}
+  use-resource-role-mappings: true
+
+# OAuth2 Resource Server Configuration
+spring.security.oauth2.resourceserver.jwt:
+  issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/facility}
+  jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/facility/protocol/openid-connect/certs}
+
+# Application-specific configuration
+app:
+  facility:
+    # NOTE: SLA timings are stored in the sla_policies table (DB-driven).
+    # The ack-time-hours / resolve-time-days / closure-time-days properties
+    # that were previously here have been removed — SLAService reads from DB.
+    deduplication:
+      window-hours: 24
+    notification:
+      retention-days: 90
+    auto-assign:
+      enabled: true
+      strategy: hybrid # round-robin | hybrid | workload-based
+    max-concurrent-users: 5000
+    max-tickets-per-day: 1000

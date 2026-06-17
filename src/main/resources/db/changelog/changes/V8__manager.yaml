@@ -1,0 +1,56 @@
+databaseChangeLog:
+
+  # ── Add manager_id to rooms ───────────────────────────────────────────────────
+  - changeSet:
+      id: V8-add-manager-id-to-rooms
+      author: admin
+      changes:
+        - addColumn:
+            tableName: rooms
+            columns:
+              - column:
+                  name: manager_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_rooms_manager
+                    references: users(id)
+        - createIndex:
+            indexName: idx_rooms_manager_id
+            tableName: rooms
+            columns:
+              - column:
+                  name: manager_id
+
+  # ── Migrate seed users from REQUESTER → MANAGER ───────────────────────────────
+  - changeSet:
+      id: V8-migrate-requester-to-manager
+      author: admin
+      changes:
+        - sql:
+            sql: >
+              UPDATE users
+              SET role = 'MANAGER'
+              WHERE role = 'REQUESTER';
+
+  # ── Assign managers to seeded rooms ──────────────────────────────────────────
+  - changeSet:
+      id: V8-assign-managers-to-rooms
+      author: admin
+      changes:
+        - sql:
+            sql: >
+              UPDATE rooms SET manager_id = (SELECT id FROM users WHERE username = 'alice_req')
+              WHERE name = 'B1-101';
+
+              UPDATE rooms SET manager_id = (SELECT id FROM users WHERE username = 'alice_req')
+              WHERE name = 'B1-1001';
+
+              UPDATE rooms SET manager_id = (SELECT id FROM users WHERE username = 'bob_req')
+              WHERE name = 'B1-603';
+
+              UPDATE rooms SET manager_id = (SELECT id FROM users WHERE username = 'bob_req')
+              WHERE name = 'D5-101';
+
+              UPDATE rooms SET manager_id = (SELECT id FROM users WHERE username = 'carol_req')
+              WHERE name = 'D3-101';

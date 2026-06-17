@@ -1,0 +1,53 @@
+databaseChangeLog:
+
+  - include:
+      file: changes/V1__identity.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/V2__facility.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/V3__ticket.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/V4__sla.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/V5__dispatch.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/V6__notification.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/V7__seed.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/V8__manager.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/V9__merge_report.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/V10__scene.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/V11__fix_seed_skill_level.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/V12__event_publication.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/V13__furniture_types.yaml
+      relativeToChangelogFile: true

@@ -1,0 +1,78 @@
+databaseChangeLog:
+
+  # ── furniture_types ───────────────────────────────────────────────────────────
+  # Runtime-configurable 3D object type definitions.
+  # Admins can add custom types or override the mesh config of built-in types.
+
+  - changeSet:
+      id: V13-create-furniture-types
+      author: admin
+      changes:
+        - createTable:
+            tableName: furniture_types
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: type_code
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: label
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: color
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+                  defaultValue: '#6b7280'
+              - column:
+                  name: system
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: false
+              - column:
+                  name: mesh_config_json
+                  type: TEXT
+                  constraints:
+                    nullable: false
+                  defaultValue: '[]'
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+  # ── seed built-in types ───────────────────────────────────────────────────────
+  - changeSet:
+      id: V13-seed-furniture-types
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO furniture_types (type_code, label, description, color, system, mesh_config_json, created_at, updated_at) VALUES
+                ('TABLE_CHAIR',    'Table + Chair',    'Wooden desk with seat',    '#c8a87a', true, '[]', NOW(), NOW()),
+                ('PC_WORKSTATION', 'PC / Workstation', 'Desktop computer setup',   '#6b7280', true, '[]', NOW(), NOW()),
+                ('PROJECTOR_AC',   'Projector / AC',   'AV or climate device',     '#1e40af', true, '[]', NOW(), NOW()),
+                ('DOOR',           'Door',             'Room entrance/exit',        '#92400e', true, '[]', NOW(), NOW()),
+                ('WINDOW',         'Window',           'Exterior window',           '#bae6fd', true, '[]', NOW(), NOW()),
+                ('BOARD',          'Whiteboard',       'Writing board',             '#ffffff', true, '[]', NOW(), NOW());

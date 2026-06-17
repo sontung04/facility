@@ -1,0 +1,30 @@
+databaseChangeLog:
+
+  # ── Rename severity_avg → severity_score on tickets ──────────────────────────
+  - changeSet:
+      id: V9-rename-severity-avg-to-severity-score
+      author: admin
+      changes:
+        - renameColumn:
+            tableName: tickets
+            oldColumnName: severity_avg
+            newColumnName: severity_score
+            columnDataType: FLOAT
+
+  # ── Drop reporter_count from tickets ─────────────────────────────────────────
+  - changeSet:
+      id: V9-drop-reporter-count
+      author: admin
+      changes:
+        - dropColumn:
+            tableName: tickets
+            columnName: reporter_count
+
+  # ── Drop reports table (merged into tickets) ──────────────────────────────────
+  - changeSet:
+      id: V9-drop-reports-table
+      author: admin
+      changes:
+        - dropTable:
+            tableName: reports
+            cascadeConstraints: true

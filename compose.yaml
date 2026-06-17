@@ -1,0 +1,122 @@
+services:
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: facility-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB}
+      POSTGRES_USER:     ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── Redis (JWT blacklist + optional cache) ───────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: facility-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # ── Spring Boot application ───────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: facility-app
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    environment:
+      # Database
+      DB_URL:      jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+      # JWT
+      JWT_SECRET:             ${JWT_SECRET}
+      JWT_EXPIRATION:         ${JWT_EXPIRATION}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
+
+      # Disable Spring Boot's own Docker-Compose startup helper –
+      # services are already managed by this compose file
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+
+      # Keycloak – only needed when authType=OAUTH2_KEYCLOAK
+      KEYCLOAK_REALM:             ${KEYCLOAK_REALM}
+      KEYCLOAK_AUTH_SERVER_URL:   http://keycloak:8080
+      KEYCLOAK_CLIENT_ID:         ${KEYCLOAK_CLIENT_ID}
+      KEYCLOAK_CLIENT_SECRET:     ${KEYCLOAK_CLIENT_SECRET}
+      KEYCLOAK_ISSUER_URI:        http://keycloak:8080/realms/${KEYCLOAK_REALM}
+      KEYCLOAK_JWK_SET_URI:       http://keycloak:8080/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ── Keycloak ─────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: facility-keycloak
+    restart: unless-stopped
+    command: start-dev
+    ports:
+      - "9090:8080"    # host:9090 → container:8080  (avoids clash with the app)
+    environment:
+      KC_DB:                    postgres
+      KC_DB_URL:                jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      KC_DB_USERNAME:           ${POSTGRES_USER}
+      KC_DB_PASSWORD:           ${POSTGRES_PASSWORD}
+      KC_DB_SCHEMA:             keycloak
+      KEYCLOAK_ADMIN:           admin
+      KEYCLOAK_ADMIN_PASSWORD:  admin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health/ready || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 8
+      start_period: 60s
+
+  # ── React front-end (Nginx + SPA) ────────────────────────────────────────────
+  frontend:
+    build:
+      context: ../Study/Đồán/source/front-end
+      dockerfile: Dockerfile
+    container_name: facility-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"           # App is reachable at http://localhost
+    depends_on:
+      - app               # Wait for Spring Boot to start before Nginx comes up
+
+volumes:
+  postgres-data:
+  redis-data:

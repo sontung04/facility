@@ -1,0 +1,299 @@
+databaseChangeLog:
+
+  # ── users (5 new; all passwords = "admin") ────────────────────────────────────
+  - changeSet:
+      id: V7-seed-users
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO users (username, email, password, role, enabled, auth_type, created_at, updated_at) VALUES
+                ('john_tech',  'john.tech@facility.com',  '$2a$10$jfxPyiUIBBXZKYUOs.8Ifeb0vszs07AaCMTq1KaY21YL7DQF1tqZi', 'TECHNICIAN', true, 'BASIC_AUTH', '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ('jane_tech',  'jane.tech@facility.com',  '$2a$10$jfxPyiUIBBXZKYUOs.8Ifeb0vszs07AaCMTq1KaY21YL7DQF1tqZi', 'TECHNICIAN', true, 'BASIC_AUTH', '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ('alice_req',  'alice@facility.com',      '$2a$10$jfxPyiUIBBXZKYUOs.8Ifeb0vszs07AaCMTq1KaY21YL7DQF1tqZi', 'REQUESTER', true, 'BASIC_AUTH', '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ('bob_req',    'bob@facility.com',        '$2a$10$jfxPyiUIBBXZKYUOs.8Ifeb0vszs07AaCMTq1KaY21YL7DQF1tqZi', 'REQUESTER', true, 'BASIC_AUTH', '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ('carol_req',  'carol@facility.com',      '$2a$10$jfxPyiUIBBXZKYUOs.8Ifeb0vszs07AaCMTq1KaY21YL7DQF1tqZi', 'REQUESTER', true, 'BASIC_AUTH', '2026-01-01 08:00:00', '2026-01-01 08:00:00');
+
+  # ── categories ────────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V7-seed-categories
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO categories (name, description, enabled, created_at, updated_at) VALUES
+                ('Electrical Issues', 'Problems related to electrical systems, wiring and power supply', true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ('Plumbing',          'Water supply, drainage and pipe-related issues',                  true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ('HVAC',              'Heating, ventilation and air conditioning system issues',         true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ('Network & IT',      'Network infrastructure, servers and IT equipment issues',         true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ('Structural',        'Building structure, walls, floors and ceiling issues',            true, '2026-01-01 08:00:00', '2026-01-01 08:00:00');
+
+  # ── buildings ─────────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V7-seed-buildings
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO buildings (name, location, description, enabled, created_at, updated_at) VALUES
+                ('B1',  'B1',  'SOICT',            true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ('D3',  'D3',  'FAMI',             true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ('D5',  'D5',  'Lecture building', true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ('D7',  'D7',  'Lecture building', true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ('D9',  'D9',  'Lecture building', true, '2026-01-01 08:00:00', '2026-01-01 08:00:00');
+
+  # ── rooms ─────────────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V7-seed-rooms
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO rooms (building_id, name, floor_number, description, created_at, updated_at) VALUES
+                ((SELECT id FROM buildings WHERE name='B1'), 'B1-101',  1,  'Computer room',    '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ((SELECT id FROM buildings WHERE name='B1'), 'B1-603',  6,  'Teacher office',   '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ((SELECT id FROM buildings WHERE name='B1'), 'B1-1001', 10, 'AI laboratory',    '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ((SELECT id FROM buildings WHERE name='D3'), 'D3-101',  1,  'Lecture hall',     '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ((SELECT id FROM buildings WHERE name='D5'), 'D5-101',  1,  'Lecture hall',     '2026-01-01 08:00:00', '2026-01-01 08:00:00');
+
+  # ── devices ───────────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V7-seed-devices
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO devices (room_id, device_code, name, device_type, description, enabled, created_at, updated_at) VALUES
+                ((SELECT id FROM rooms WHERE name='B1-101'), 'DEV-001', 'PC-001',               'PC',              'PC for student practice',                        true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ((SELECT id FROM rooms WHERE name='B1-101'), 'DEV-002', 'Air conditioner',       'ELECTRONIC',      '',                                               true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ((SELECT id FROM rooms WHERE name='B1-101'), 'DEV-003', 'Ceiling Projector',     'AV',              'Ceiling-mounted 4K projector for presentations',  true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ((SELECT id FROM rooms WHERE name='B1-101'), 'DEV-004', 'Front-door',            'PHYSICAL_DEVICE', '',                                               true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ((SELECT id FROM rooms WHERE name='B1-101'), 'DEV-005', 'Light-1',               'ELECTRONIC',      '',                                               true, '2026-01-01 08:00:00', '2026-01-01 08:00:00');
+
+  # ── technician_skills ─────────────────────────────────────────────────────────
+  # john_tech: Electrical(EXPERT), HVAC(INTERMEDIATE), Structural(BEGINNER)
+  # jane_tech: Plumbing(EXPERT), Network & IT(ADVANCED)
+  - changeSet:
+      id: V7-seed-technician-skills
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO technician_skills (user_id, category_id, skill_level, max_concurrent_jobs, available, created_at) VALUES
+                ((SELECT id FROM users WHERE username='john_tech'), (SELECT id FROM categories WHERE name='Electrical Issues'), 'EXPERT',       5, true, '2026-01-01 08:00:00'),
+                ((SELECT id FROM users WHERE username='john_tech'), (SELECT id FROM categories WHERE name='HVAC'),              'INTERMEDIATE', 3, true, '2026-01-01 08:00:00'),
+                ((SELECT id FROM users WHERE username='john_tech'), (SELECT id FROM categories WHERE name='Structural'),        'BEGINNER',     2, true, '2026-01-01 08:00:00'),
+                ((SELECT id FROM users WHERE username='jane_tech'), (SELECT id FROM categories WHERE name='Plumbing'),          'EXPERT',       5, true, '2026-01-01 08:00:00'),
+                ((SELECT id FROM users WHERE username='jane_tech'), (SELECT id FROM categories WHERE name='Network & IT'),      'ADVANCED',     4, true, '2026-01-01 08:00:00');
+
+  # ── sla_policies (one per category) ──────────────────────────────────────────
+  - changeSet:
+      id: V7-seed-sla-policies
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO sla_policies (category_id, acknowledgment_time_minutes, resolution_time_minutes, closure_time_minutes, is_active, created_at, updated_at) VALUES
+                ((SELECT id FROM categories WHERE name='Electrical Issues'), 30,  240,  1440, true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ((SELECT id FROM categories WHERE name='Plumbing'),          60,  480,  2880, true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ((SELECT id FROM categories WHERE name='HVAC'),              30,  120,   720, true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ((SELECT id FROM categories WHERE name='Network & IT'),      15,   60,   480, true, '2026-01-01 08:00:00', '2026-01-01 08:00:00'),
+                ((SELECT id FROM categories WHERE name='Structural'),       120, 1440,  4320, true, '2026-01-01 08:00:00', '2026-01-01 08:00:00');
+
+  # ── tickets ───────────────────────────────────────────────────────────────────
+  # Device–category mapping:
+  #   DEV-001 PC-001           → Network & IT  → jane_tech (ADVANCED)
+  #   DEV-002 Air conditioner  → HVAC          → john_tech (INTERMEDIATE)
+  #   DEV-003 Ceiling Projector→ Electrical    → john_tech (EXPERT)
+  #   DEV-004 Front-door       → Structural    → john_tech (BEGINNER)
+  #   DEV-005 Light-1          → Electrical    → john_tech (EXPERT)
+  - changeSet:
+      id: V7-seed-tickets
+      author: admin
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              INSERT INTO tickets (
+                ticket_number, category_id, device_id,
+                status, severity_avg, severity_level, description,
+                reported_by, assigned_technician_id, assignment_notes,
+                reporter_count,
+                submitted_at, ack_at, assigned_at, in_progress_at, resolved_at, closed_at,
+                sla_ack_breached, sla_resolve_breached, sla_closure_breached,
+                created_at, updated_at
+              ) VALUES
+              (
+                'TKT-2026-001',
+                (SELECT id FROM categories WHERE name='Electrical Issues'),
+                (SELECT id FROM devices WHERE device_code='DEV-005'),
+                'CLOSED', 4.0, 'HIGH',
+                'Light-1 in B1-101 flickering and tripping the circuit breaker. Room unusable during lab sessions.',
+                (SELECT id FROM users WHERE username='alice_req'),
+                (SELECT id FROM users WHERE username='john_tech'),
+                'Assigned to john_tech — electrical expert.',
+                2,
+                '2026-01-10 08:00:00', '2026-01-10 08:20:00', '2026-01-10 09:00:00',
+                '2026-01-10 09:30:00', '2026-01-10 13:00:00', '2026-01-11 09:00:00',
+                false, false, false,
+                '2026-01-10 08:00:00', '2026-01-11 09:00:00'
+              ),
+              (
+                'TKT-2026-002',
+                (SELECT id FROM categories WHERE name='HVAC'),
+                (SELECT id FROM devices WHERE device_code='DEV-002'),
+                'RESOLVED', 2.8, 'MEDIUM',
+                'Air conditioner in B1-101 not cooling. Room temperature reaching 30°C, affecting student practice sessions.',
+                (SELECT id FROM users WHERE username='bob_req'),
+                (SELECT id FROM users WHERE username='john_tech'),
+                'Assigned to john_tech — HVAC intermediate skill.',
+                1,
+                '2026-02-05 10:00:00', '2026-02-05 10:25:00', '2026-02-05 11:00:00',
+                '2026-02-05 11:30:00', '2026-02-05 15:00:00', NULL,
+                false, false, false,
+                '2026-02-05 10:00:00', '2026-02-05 15:00:00'
+              ),
+              (
+                'TKT-2026-003',
+                (SELECT id FROM categories WHERE name='Network & IT'),
+                (SELECT id FROM devices WHERE device_code='DEV-001'),
+                'RESOLVED', 3.5, 'HIGH',
+                'PC-001 in B1-101 cannot connect to campus network. Students unable to access lab exercises.',
+                (SELECT id FROM users WHERE username='carol_req'),
+                (SELECT id FROM users WHERE username='jane_tech'),
+                'Reassigned to jane_tech — network & IT advanced skill.',
+                1,
+                '2026-03-12 14:00:00', '2026-03-12 14:10:00', '2026-03-12 14:30:00',
+                '2026-03-12 14:45:00', '2026-03-12 16:00:00', NULL,
+                false, false, false,
+                '2026-03-12 14:00:00', '2026-03-12 16:00:00'
+              ),
+              (
+                'TKT-2026-004',
+                (SELECT id FROM categories WHERE name='Structural'),
+                (SELECT id FROM devices WHERE device_code='DEV-004'),
+                'RESOLVED', 1.8, 'LOW',
+                'Front-door of B1-101 latch is broken — door cannot be locked after class.',
+                (SELECT id FROM users WHERE username='alice_req'),
+                (SELECT id FROM users WHERE username='john_tech'),
+                'Assigned to john_tech for structural/physical inspection.',
+                1,
+                '2026-04-01 09:00:00', '2026-04-01 11:00:00', '2026-04-01 13:00:00',
+                '2026-04-01 14:00:00', '2026-04-01 16:00:00', NULL,
+                false, false, false,
+                '2026-04-01 09:00:00', '2026-04-01 16:00:00'
+              ),
+              (
+                'TKT-2026-005',
+                (SELECT id FROM categories WHERE name='Electrical Issues'),
+                (SELECT id FROM devices WHERE device_code='DEV-003'),
+                'CLOSED', 2.5, 'MEDIUM',
+                'Ceiling projector in B1-101 will not power on. Power indicator stays red.',
+                (SELECT id FROM users WHERE username='bob_req'),
+                (SELECT id FROM users WHERE username='john_tech'),
+                'Assigned to john_tech — electrical issue with AV equipment.',
+                1,
+                '2026-04-20 10:00:00', '2026-04-20 10:28:00', '2026-04-20 11:00:00',
+                '2026-04-20 13:00:00', '2026-04-20 15:30:00', '2026-04-21 09:00:00',
+                false, false, false,
+                '2026-04-20 10:00:00', '2026-04-21 09:00:00'
+              )
+
+  # ── reports ───────────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V7-seed-reports
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO reports (ticket_id, requester_id, severity_score, description, created_at) VALUES
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-001'), (SELECT id FROM users WHERE username='alice_req'), 4.0, 'Light-1 tripping breaker confirmed. Two lab PCs lost power mid-session. Room marked unsafe.', '2026-01-10 08:05:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-002'), (SELECT id FROM users WHERE username='bob_req'),   2.8, 'AC unit running but blowing warm air. Thermometer reads 30°C. Students reporting discomfort.', '2026-02-05 10:05:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-003'), (SELECT id FROM users WHERE username='carol_req'), 3.5, 'PC-001 shows no network adapter in device manager. Likely driver or NIC failure.', '2026-03-12 14:05:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-004'), (SELECT id FROM users WHERE username='alice_req'), 1.8, 'Door latch spring broken. Door swings open freely. Security concern after hours.', '2026-04-01 09:05:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-005'), (SELECT id FROM users WHERE username='bob_req'),   2.5, 'Projector power LED red. No image output. Tried different power socket — same result.', '2026-04-20 10:05:00');
+
+  # ── comments ──────────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V7-seed-comments
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO comments (ticket_id, user_id, content, created_at, updated_at) VALUES
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-001'), (SELECT id FROM users WHERE username='admin'),     'Acknowledged. Electrical technician dispatched to B1-101 immediately.', '2026-01-10 08:20:00', '2026-01-10 08:20:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-001'), (SELECT id FROM users WHERE username='john_tech'), 'On site. Found loose neutral wire on Light-1 causing arcing. Re-terminated and secured. Circuit stable.', '2026-01-10 11:00:00', '2026-01-10 11:00:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-002'), (SELECT id FROM users WHERE username='john_tech'), 'Refrigerant level low. Topped up and cleaned filters. AC back to normal cooling.', '2026-02-05 14:30:00', '2026-02-05 14:30:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-003'), (SELECT id FROM users WHERE username='jane_tech'), 'NIC driver corrupted. Reinstalled driver and ran network diagnostics. PC-001 back on campus network.', '2026-03-12 15:45:00', '2026-03-12 15:45:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-005'), (SELECT id FROM users WHERE username='john_tech'), 'Projector internal fuse blown. Replaced fuse and tested — now powering on and displaying correctly.', '2026-04-20 15:00:00', '2026-04-20 15:00:00');
+
+  # ── audit_logs ────────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V7-seed-audit-logs
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO audit_logs (user_id, action, entity_type, entity_id, changes, created_at) VALUES
+                ((SELECT id FROM users WHERE username='admin'),     'ACKNOWLEDGE_TICKET', 'TICKET', (SELECT id FROM tickets WHERE ticket_number='TKT-2026-001'), '{"status":{"from":"SUBMITTED","to":"ACK"}}',                                      '2026-01-10 08:20:00'),
+                ((SELECT id FROM users WHERE username='admin'),     'ASSIGN_TICKET',      'TICKET', (SELECT id FROM tickets WHERE ticket_number='TKT-2026-001'), '{"assignedTo":"john_tech","status":{"from":"ACK","to":"ASSIGNED"}}',              '2026-01-10 09:00:00'),
+                ((SELECT id FROM users WHERE username='john_tech'), 'START_TICKET',       'TICKET', (SELECT id FROM tickets WHERE ticket_number='TKT-2026-001'), '{"status":{"from":"ASSIGNED","to":"IN_PROGRESS"}}',                               '2026-01-10 09:30:00'),
+                ((SELECT id FROM users WHERE username='john_tech'), 'RESOLVE_TICKET',     'TICKET', (SELECT id FROM tickets WHERE ticket_number='TKT-2026-001'), '{"status":{"from":"IN_PROGRESS","to":"RESOLVED"}}',                               '2026-01-10 13:00:00'),
+                ((SELECT id FROM users WHERE username='admin'),     'CLOSE_TICKET',       'TICKET', (SELECT id FROM tickets WHERE ticket_number='TKT-2026-001'), '{"status":{"from":"RESOLVED","to":"CLOSED"}}',                                    '2026-01-11 09:00:00');
+
+  # ── resolution_feedback (one per ticket — unique constraint on ticket_id) ─────
+  - changeSet:
+      id: V7-seed-resolution-feedback
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO resolution_feedback (ticket_id, technician_id, rated_by, rating, comment, created_at) VALUES
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-001'), (SELECT id FROM users WHERE username='john_tech'), (SELECT id FROM users WHERE username='alice_req'), 5, 'Fixed quickly. B1-101 back in service the same day. Very professional.',           '2026-01-11 10:00:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-002'), (SELECT id FROM users WHERE username='john_tech'), (SELECT id FROM users WHERE username='bob_req'),   4, 'AC working well now. Took half a day but room is comfortable again.',               '2026-02-06 09:00:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-003'), (SELECT id FROM users WHERE username='jane_tech'), (SELECT id FROM users WHERE username='carol_req'), 5, 'Jane diagnosed and fixed the network issue in under 2 hours. Excellent service.',  '2026-03-13 09:00:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-004'), (SELECT id FROM users WHERE username='john_tech'), (SELECT id FROM users WHERE username='alice_req'), 4, 'Door latch replaced and works perfectly. Prompt response appreciated.',             '2026-04-02 09:00:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-005'), (SELECT id FROM users WHERE username='john_tech'), (SELECT id FROM users WHERE username='bob_req'),   4, 'Projector repaired same day. Fuse replacement was clean and quick.',               '2026-04-21 10:00:00');
+
+  # ── sla_breaches ──────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V7-seed-sla-breaches
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO sla_breaches (ticket_id, breach_type, expected_by, actual_breach_at, is_breached, created_at) VALUES
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-001'), 'ACK_BREACH',     '2026-01-10 08:30:00', NULL,                   false, '2026-01-10 08:00:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-002'), 'ACK_BREACH',     '2026-02-05 10:30:00', NULL,                   false, '2026-02-05 10:00:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-003'), 'RESOLVE_BREACH', '2026-03-12 16:00:00', NULL,                   false, '2026-03-12 14:00:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-004'), 'ACK_BREACH',     '2026-04-01 10:00:00', '2026-04-01 11:00:00', true,  '2026-04-01 09:00:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-005'), 'RESOLVE_BREACH', '2026-04-20 14:00:00', NULL,                   false, '2026-04-20 10:00:00');
+
+  # ── dispatch_history ──────────────────────────────────────────────────────────
+  # TKT-2026-003 shows a reassignment: first john_tech, then jane_tech
+  - changeSet:
+      id: V7-seed-dispatch-history
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO dispatch_history (ticket_id, technician_id, previous_technician_id, dispatcher_id, dispatch_type, notes, created_at) VALUES
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-001'), (SELECT id FROM users WHERE username='john_tech'), NULL,                                               (SELECT id FROM users WHERE username='admin'), 'MANUAL', 'Assigned john_tech — electrical expert for lighting fault.',              '2026-01-10 09:00:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-002'), (SELECT id FROM users WHERE username='john_tech'), NULL,                                               (SELECT id FROM users WHERE username='admin'), 'AUTO',   'Auto-dispatched to john_tech based on HVAC skill match.',                 '2026-02-05 11:00:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-003'), (SELECT id FROM users WHERE username='john_tech'), NULL,                                               (SELECT id FROM users WHERE username='admin'), 'MANUAL', 'Initial assignment to john_tech (incorrect — no IT skill).',             '2026-03-12 14:20:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-003'), (SELECT id FROM users WHERE username='jane_tech'), (SELECT id FROM users WHERE username='john_tech'), (SELECT id FROM users WHERE username='admin'), 'MANUAL', 'Reassigned to jane_tech — Network & IT advanced skill.',                 '2026-03-12 14:30:00'),
+                ((SELECT id FROM tickets WHERE ticket_number='TKT-2026-004'), (SELECT id FROM users WHERE username='john_tech'), NULL,                                               (SELECT id FROM users WHERE username='admin'), 'AUTO',   'Auto-dispatched to john_tech for structural/physical device inspection.', '2026-04-01 13:00:00');
+
+  # ── notifications ─────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V7-seed-notifications
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO notifications (user_id, ticket_id, type, title, message, is_read, created_at) VALUES
+                ((SELECT id FROM users WHERE username='alice_req'), (SELECT id FROM tickets WHERE ticket_number='TKT-2026-001'), 'STATUS_CHANGE',  'Ticket TKT-2026-001 Acknowledged',           'Your electrical fault ticket for B1-101 has been acknowledged and a technician is on the way.',    true,  '2026-01-10 08:20:00'),
+                ((SELECT id FROM users WHERE username='john_tech'), (SELECT id FROM tickets WHERE ticket_number='TKT-2026-001'), 'ASSIGNMENT',     'New Ticket Assigned: TKT-2026-001',           'You have been assigned a HIGH priority electrical ticket in B1-101. Please attend immediately.',    true,  '2026-01-10 09:00:00'),
+                ((SELECT id FROM users WHERE username='carol_req'), (SELECT id FROM tickets WHERE ticket_number='TKT-2026-003'), 'STATUS_CHANGE',  'Ticket TKT-2026-003 Assigned',                'Your network ticket for PC-001 has been assigned to a specialist technician.',                      true,  '2026-03-12 14:30:00'),
+                ((SELECT id FROM users WHERE username='jane_tech'), (SELECT id FROM tickets WHERE ticket_number='TKT-2026-003'), 'ASSIGNMENT',     'New Ticket Assigned: TKT-2026-003',           'You have been reassigned a Network & IT ticket for PC-001 in B1-101. Review and attend.',          true,  '2026-03-12 14:30:00'),
+                ((SELECT id FROM users WHERE username='carol_req'), (SELECT id FROM tickets WHERE ticket_number='TKT-2026-003'), 'COMMENT',        'Technician Update on TKT-2026-003',           'jane_tech: NIC driver reinstalled. PC-001 is back on the campus network.',                         false, '2026-03-12 15:45:00');

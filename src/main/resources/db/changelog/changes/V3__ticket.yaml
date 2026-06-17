@@ -1,0 +1,398 @@
+databaseChangeLog:
+
+  # ── tickets ───────────────────────────────────────────────────────────────────
+  # Merged: original create + in_progress_at (was changeset 18)
+  # Fixed:  reported_by column was missing from the original changelog entirely
+  - changeSet:
+      id: V3-create-tickets
+      author: admin
+      changes:
+        - createTable:
+            tableName: tickets
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ticket_number
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: category_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_tickets_category
+                    references: categories(id)
+              - column:
+                  name: device_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_tickets_device
+                    references: devices(id)
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                  defaultValue: SUBMITTED
+              - column:
+                  name: severity_avg
+                  type: FLOAT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: severity_level
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reported_by
+                  type: BIGINT
+              - column:
+                  name: assigned_technician_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_tickets_technician
+                    references: users(id)
+              - column:
+                  name: assignment_notes
+                  type: TEXT
+              - column:
+                  name: reporter_count
+                  type: INT
+                  defaultValue: 1
+              - column:
+                  name: submitted_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: ack_at
+                  type: TIMESTAMP
+              - column:
+                  name: assigned_at
+                  type: TIMESTAMP
+              - column:
+                  name: in_progress_at
+                  type: TIMESTAMP
+              - column:
+                  name: resolved_at
+                  type: TIMESTAMP
+              - column:
+                  name: closed_at
+                  type: TIMESTAMP
+              - column:
+                  name: sla_ack_breached
+                  type: BOOLEAN
+                  defaultValue: false
+              - column:
+                  name: sla_resolve_breached
+                  type: BOOLEAN
+                  defaultValue: false
+              - column:
+                  name: sla_closure_breached
+                  type: BOOLEAN
+                  defaultValue: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - createIndex:
+            indexName: idx_tickets_ticket_number
+            tableName: tickets
+            columns:
+              - column:
+                  name: ticket_number
+        - createIndex:
+            indexName: idx_tickets_category_id
+            tableName: tickets
+            columns:
+              - column:
+                  name: category_id
+        - createIndex:
+            indexName: idx_tickets_device_id
+            tableName: tickets
+            columns:
+              - column:
+                  name: device_id
+        - createIndex:
+            indexName: idx_tickets_assigned_technician_id
+            tableName: tickets
+            columns:
+              - column:
+                  name: assigned_technician_id
+        - createIndex:
+            indexName: idx_tickets_status
+            tableName: tickets
+            columns:
+              - column:
+                  name: status
+        - createIndex:
+            indexName: idx_tickets_submitted_at
+            tableName: tickets
+            columns:
+              - column:
+                  name: submitted_at
+
+  # ── reports ───────────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V3-create-reports
+      author: admin
+      changes:
+        - createTable:
+            tableName: reports
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ticket_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_reports_ticket
+                    references: tickets(id)
+              - column:
+                  name: requester_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_reports_requester
+                    references: users(id)
+              - column:
+                  name: severity_score
+                  type: FLOAT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - createIndex:
+            indexName: idx_reports_ticket_id
+            tableName: reports
+            columns:
+              - column:
+                  name: ticket_id
+        - createIndex:
+            indexName: idx_reports_requester_id
+            tableName: reports
+            columns:
+              - column:
+                  name: requester_id
+
+  # ── comments ──────────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V3-create-comments
+      author: admin
+      changes:
+        - createTable:
+            tableName: comments
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ticket_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_comment_ticket
+                    references: tickets(id)
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_comment_user
+                    references: users(id)
+              - column:
+                  name: content
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - createIndex:
+            indexName: idx_comment_ticket_id
+            tableName: comments
+            columns:
+              - column:
+                  name: ticket_id
+        - createIndex:
+            indexName: idx_comment_user_id
+            tableName: comments
+            columns:
+              - column:
+                  name: user_id
+
+  # ── audit_logs ────────────────────────────────────────────────────────────────
+  - changeSet:
+      id: V3-create-audit-logs
+      author: admin
+      changes:
+        - createTable:
+            tableName: audit_logs
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_audit_user
+                    references: users(id)
+              - column:
+                  name: action
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_type
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_id
+                  type: BIGINT
+              - column:
+                  name: changes
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - createIndex:
+            indexName: idx_audit_user_id
+            tableName: audit_logs
+            columns:
+              - column:
+                  name: user_id
+        - createIndex:
+            indexName: idx_audit_entity_type
+            tableName: audit_logs
+            columns:
+              - column:
+                  name: entity_type
+        - createIndex:
+            indexName: idx_audit_created_at
+            tableName: audit_logs
+            columns:
+              - column:
+                  name: created_at
+
+  # ── resolution_feedback ───────────────────────────────────────────────────────
+  - changeSet:
+      id: V3-create-resolution-feedback
+      author: admin
+      changes:
+        - createTable:
+            tableName: resolution_feedback
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ticket_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+                    foreignKeyName: fk_feedback_ticket
+                    references: tickets(id)
+              - column:
+                  name: technician_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_feedback_technician
+                    references: users(id)
+              - column:
+                  name: rated_by
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_feedback_rater
+                    references: users(id)
+              - column:
+                  name: rating
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - addUniqueConstraint:
+            tableName: resolution_feedback
+            columnNames: ticket_id
+            constraintName: uk_feedback_ticket
+        - createIndex:
+            indexName: idx_feedback_ticket_id
+            tableName: resolution_feedback
+            columns:
+              - column:
+                  name: ticket_id
+        - createIndex:
+            indexName: idx_feedback_technician_id
+            tableName: resolution_feedback
+            columns:
+              - column:
+                  name: technician_id

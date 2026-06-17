@@ -1,0 +1,51 @@
+databaseChangeLog:
+
+  # ── room_scenes ───────────────────────────────────────────────────────────────
+  # Stores the 3D scene layout (dimensions + furniture objects JSON) for a room.
+  # One-to-one with rooms — uses room_id as both PK and FK.
+  - changeSet:
+      id: V10-create-room-scenes
+      author: admin
+      changes:
+        - createTable:
+            tableName: room_scenes
+            columns:
+              - column:
+                  name: room_id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: fk_room_scenes_room
+                    references: rooms(id)
+                    deleteCascade: true
+              - column:
+                  name: width
+                  type: FLOAT
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: 10.0
+              - column:
+                  name: height
+                  type: FLOAT
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: 3.0
+              - column:
+                  name: length
+                  type: FLOAT
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: 10.0
+              - column:
+                  name: objects_json
+                  type: TEXT
+                  constraints:
+                    nullable: false
+                  defaultValue: '[]'
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
