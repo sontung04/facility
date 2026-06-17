@@ -108,7 +108,7 @@ services:
   # ── React front-end (Nginx + SPA) ────────────────────────────────────────────
   frontend:
     build:
-      context: ../Study/Đồán/source/front-end
+      context: ../front-end
       dockerfile: Dockerfile
     container_name: facility-frontend
     restart: unless-stopped

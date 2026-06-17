@@ -41,9 +41,18 @@ Inter-module communication uses typed **Module API interfaces** (sync) and **App
 
 ### 1. Clone the repository
 
+Back-end
+
 ```bash
-git clone <repo-url>
+git clone https://github.com/sontung04/facility
 cd facility
+```
+
+Front-end
+
+```bash
+git clone https://github.com/sontung04/facility-fe
+cd front-end
 ```
 
 ### 2. Configure environment variables
